@@ -18,11 +18,8 @@
 #define LEETCODE_GRAPHQL_URL "https://leetcode.com/graphql"
 
 namespace {
-std::size_t callback(
-    const char* in,
-    std::size_t size,
-    std::size_t num,
-    std::string* out) {
+std::size_t callback(const char* in, std::size_t size, std::size_t num,
+                     std::string* out) {
     const std::size_t totalBytes(size * num);
     out->append(in, totalBytes);
     return totalBytes;
@@ -40,7 +37,8 @@ std::string read_from_file(std::string file_path) {
     return ss.str();
 }
 
-bool get_code_snip(std::string slug, std::string tk_file_path, std::string& code) {
+bool get_code_snip(std::string slug, std::string tk_file_path,
+                   std::string& code) {
     CURL* curl = curl_easy_init();
 
     if (curl) {
@@ -62,7 +60,11 @@ bool get_code_snip(std::string slug, std::string tk_file_path, std::string& code
         curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
 
         ss.str("");
-        ss << "{ \"operationName\": \"questionData\", \"query\": \"query questionData { question(titleSlug: \\\"" << slug << "\\\") { questionId title titleSlug codeSnippets { lang langSlug code } }}\" }";
+        ss << "{ \"operationName\": \"questionData\", \"query\": \"query "
+              "questionData { question(titleSlug: \\\""
+           << slug
+           << "\\\") { questionId title titleSlug codeSnippets { lang langSlug "
+              "code } }}\" }";
         std::string body = ss.str();
 
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body.c_str());
@@ -93,7 +95,8 @@ bool get_code_snip(std::string slug, std::string tk_file_path, std::string& code
         }
 
         if (!val["errors"].empty()) {
-            std::cerr << "Error: " << val["errors"][0]["message"].asString() << std::endl;
+            std::cerr << "Error: " << val["errors"][0]["message"].asString()
+                      << std::endl;
             return false;
         }
 
@@ -154,12 +157,16 @@ std::string get_question_slug(int q_id, int& d_lvl) {
     return ret;
 }
 
-bool create_folder_and_file(int d_lvl, int q_id, std::string slug, std::string snippet) {
+bool create_folder_and_file(int d_lvl, int q_id, std::string slug,
+                            std::string snippet) {
     std::stringstream ss;
 
-    ss << ((d_lvl == 1) ? "EASY" : (d_lvl == 2) ? "MEDIUM" : (d_lvl == 3) ? "HARD" : "UNKNOWN");
+    ss << ((d_lvl == 1)
+               ? "EASY"
+               : (d_lvl == 2) ? "MEDIUM" : (d_lvl == 3) ? "HARD" : "UNKNOWN");
 
-    if (!boost::filesystem::exists(ss.str()) && !boost::filesystem::create_directory(ss.str())) {
+    if (!boost::filesystem::exists(ss.str()) &&
+        !boost::filesystem::create_directory(ss.str())) {
         return false;
     }
 
@@ -173,6 +180,8 @@ bool create_folder_and_file(int d_lvl, int q_id, std::string slug, std::string s
 
     std::ofstream f;
     f.open(ss.str());
+    f << "#include \"../../headers/leetcode.hpp\"" << std::endl;
+    f << std::endl;
     f << snippet;
 
     f.close();
@@ -221,7 +230,8 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Creating the folder and code snippet file..." << std::endl;
     if (create_folder_and_file(d_lvl, q_id, slug, snippet)) {
-        std::cout << "The folder and code have been created: " << q_id << "." << slug;
+        std::cout << "The folder and code have been created: " << q_id << "."
+                  << slug;
         return 0;
     } else {
         std::cerr << "Create folder and write file failed";
