@@ -139,6 +139,8 @@ std::string get_question_slug(int q_id, int& d_lvl) {
             return ret;
         }
 
+        std::cout << "Get slug title Successfully" << std::endl;
+
         Json::Reader reader;
         Json::Value val;
 
@@ -146,8 +148,9 @@ std::string get_question_slug(int q_id, int& d_lvl) {
             Json::Value j = val["stat_status_pairs"];
 
             for (unsigned int i = 0; i < j.size(); i++) {
-                if (j[i]["stat"]["question_id"].asInt() == q_id) {
+                if (j[i]["stat"]["frontend_question_id"].asInt() == q_id) {
                     d_lvl = j[i]["difficulty"]["level"].asInt();
+                    std::cout << j[i]["stat"] << std::endl;
                     return j[i]["stat"]["question__title_slug"].asString();
                 }
             }
